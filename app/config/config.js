@@ -4,7 +4,6 @@ const
 	{ promisify, } = require('util'),
 	{ watch: fileWatcher, } = require('chokidar');
 
-
 const
 	readFileAsync = promisify(readFile),
 	files = {
@@ -16,8 +15,7 @@ const
 async function loadConfig(config, configFiles = files) {
 	for (const param in configFiles) {
 		if (Object.prototype.hasOwnProperty.call(configFiles, param)) {
-			const
-				filePath = configFiles[param];
+			const filePath = configFiles[param];
 
 			let json,
 				newConfig;
@@ -25,16 +23,7 @@ async function loadConfig(config, configFiles = files) {
 			try {
 				json = await readFileAsync(filePath);
 				newConfig = JSON.parse(json);
-				let oldConfig = config[param];
 				config[param] = newConfig;
-				console.log(
-					'Updated config for',
-					param,
-					'\nold:\n',
-					oldConfig,
-					'\nnew:\n',
-					newConfig
-				);
 			} catch (error) {
 				console.error('Error while reloading config:', filePath, error);
 			}
@@ -43,11 +32,9 @@ async function loadConfig(config, configFiles = files) {
 	return true;
 }
 
-// Deprecated: setInterval(Update, 5000);
-fileWatcher(Object.values(files))
-	.on('change', () => {
-		loadConfig(config, files);
-	});
+fileWatcher(Object.values(files)).on('change', () => {
+	loadConfig(config, files);
+});
 
 module.exports = {
 	config,
