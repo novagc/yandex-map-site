@@ -1,6 +1,8 @@
 .vs
 app/config/*.json
-
+app/data/*.json
+app/data/*.tb
+ 
 # Logs
 logs
 *.log
