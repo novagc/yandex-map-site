@@ -8,6 +8,7 @@ class DataRouter {
         this.router = Router();
 
         this.router.get(`/${this.dataController.typeName}`, check, this.Get);
+        this.router.get(`/${this.dataController.typeName}/state`, check, this.State);
         this.router.post(`/${this.dataController.typeName}/add`, check, this.Add);
         this.router.post(`/${this.dataController.typeName}/update`, check, this.Update);
         this.router.post(`/${this.dataController.typeName}/delete`, check, this.Delete);
@@ -15,6 +16,10 @@ class DataRouter {
 
     Get(req, res) {
         res.send(this.dataController.ToString());
+    }
+
+    State(req, res) {
+        res.send({ stateId: this.dataController.stateId });   
     }
 
     Add(req, res) {

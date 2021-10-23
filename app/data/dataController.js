@@ -11,10 +11,17 @@ class DataController {
         } else {
             this.data = require(this.filePath);
         }
+
+        this.GenerateNewStateId();
+    }
+
+    GenerateNewStateId() {
+        this.stateId = Math.floor(Math.random() * Math.floor(1e20));
     }
 
     Save() {
         fs.writeFile(this.filePath, JSON.stringify(this.data), () => {});
+        this.GenerateNewStateId();
     }
     
     Add(elem) {
@@ -40,6 +47,10 @@ class DataController {
         }
     }
     
+    State() {
+        return this.stateId;
+    }
+
     ToString() {
         return JSON.stringify({ [this.typeName]: this.data, });
     }
