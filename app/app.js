@@ -11,9 +11,10 @@ function Start() {
     loadConfig(config).then(() => {
         passportInit();
     
-        app.set('view engine', 'hbs');
-    
-        app.use(express.static('public'));
+        app.set('view engine', 'pug');
+        app.set("views", `${__dirname}/views`); 
+
+        app.use(express.static(`${__dirname}/public`));
         app.use(bodyParser());
         app.use(bodyParser.urlencoded());
         app.use(session({ secret: 'ASFDJLSKDJOVN', }));
@@ -23,8 +24,12 @@ function Start() {
     
         app.use(require('./routes/index'));
         app.use(require('./routes/points'));
+        app.use(require('./routes/marks'));
         app.use(require('./routes/login'));
+        app.use(require('./routes/editor'));
     
+        console.log(`http://${config.server.host}:${config.server.port}`);
+
         app.listen(config.server.port);
     });
 }

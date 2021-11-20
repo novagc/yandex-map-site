@@ -1,6 +1,6 @@
 const 
 	fs = require('fs'),
-	filePath = './data/users.tb';
+	filePath = `${__dirname}/users.tb`;
 
 var obj = {
 	list: {},
@@ -21,7 +21,7 @@ function Update() {
 }
 
 if(!fs.existsSync(filePath)) {
-	fs.writeFileSync('');		
+	fs.writeFileSync(filePath, '');		
 }
 
 Update();

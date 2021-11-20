@@ -16,7 +16,7 @@ class DataController {
     }
 
     GenerateNewStateId() {
-        this.stateId = Math.floor(Math.random() * Math.floor(1e20));
+        this.stateId = Math.floor(Math.random() * Math.floor(1e17));
     }
 
     Save() {

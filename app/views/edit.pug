@@ -1,0 +1,79 @@
+doctype html
+html(lang="en")
+    head.w-100.h-100 
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Editor
+        link(rel="stylesheet", href="/css/bootstrap.css")
+        link(rel="stylesheet", href="/css/edit.css")
+        script(src="/js/jquery.min.js") 
+        script(src="/js/requests.js") 
+        - var paramTypes = ["Число", "Флаг"];
+        script.
+            var marks = !{JSON.stringify(marks)};
+            var imgs = !{JSON.stringify(imgs)};
+            var paramTypes = !{JSON.stringify(paramTypes)};
+    body.w-100.h-100.bg-light
+        div.container.mb-5
+            .row.py-5 
+                h1.text-center.w-100 Редактор данных меток
+            .row.justify-content-center.g-5
+                .col-3.order-last.d-flex.flex-column.sticky-top#mark-menu
+                    ul.list-group.rounded.unselectable-recursive.mb-3
+                        li.list-group-item.active.text-center.fs-4.py-2 Метки
+                        each mark, index in marks
+                            li(id=`mark-${mark.id}` type="button" class={"active-mark": index == 0} data-id=mark.id onclick=`ChangeActiveMark(${mark.id});`).list-group-item.list-group-item-action=mark.name
+                        li#new-mark(type="button" data-id="-1" onclick="ChangeActiveMark(-1);").list-group-item.list-group-item-action.text-center.py-1.fw-bold +
+                    
+                    button#btn-edit(type="button" onclick="Edit();").btn.btn-outline-primary.mb-3 Редактировать
+                    button#btn-save(type="button" disabled onclick="Save();").btn.btn-outline-primary.mb-3 Сохранить
+                    button#btn-back(type="button" onclick="Back();").btn.btn-outline-primary.mb-3 Назад
+                .col-6.rounded
+                        .row.g-3.editor-content
+                            input#input-id(type="hidden" value=marks[0].id)
+                            .col-12
+                                label(for="info-name").form-label Название
+                                input#input-name(type="text" disabled value=marks[0].name).form-control
+                        .row.d-flex.flex-row.justify-content-center.mt-4
+                            hr(style="width:90%;")
+                        .row.gy-1#container-types
+                            .col-12 
+                                label.form-label.w-100.text-center.fs-4 Типы
+                            .col-6 
+                                label.form-label.w-100.text-center Название
+                            .col-6 
+                                label.form-label.w-100.text-center Изображение
+                            .col-12
+                                .row.gy-1#list-types
+                                    each x in marks[0].types
+                                        .col-12.d-flex.flex-row.justify-content-between
+                                            input(type="hidden" value=x.id)
+                                            input(type="text" disabled value=x.name).form-control
+                                            select(disabled).form-select
+                                                each img in imgs 
+                                                    option(value=img selected=img==x.imgPath)=img
+                            .col-12.mt-3
+                                button#btn-types(onclick="AddNewListItem(htmlElems.list.types, imgs);" disabled type="button").btn.btn-outline-primary.w-100 Добавить
+                        .row.d-flex.flex-row.justify-content-center.mt-4
+                            hr(style="width:90%;")
+                        .row.gy-1#container-params
+                            .col-12 
+                                label.form-label.w-100.text-center.fs-4 Дополнительные параметры
+                            .col-6 
+                                label.form-label.w-100.text-center Название
+                            .col-6 
+                                label.form-label.w-100.text-center Тип данных
+                            .col-12
+                                .row.gy-1#list-params
+                                    if marks[0].params
+                                        each x in marks[0].params
+                                            .col-12.d-flex.flex-row.justify-content-between
+                                                input(type="hidden" value=x.id)
+                                                input(type="text" disabled value=x.name).form-control
+                                                select(disabled).form-select
+                                                    each y, index in paramTypes
+                                                        option(value=y selected=index==x.type)=y
+                            .col-12.mt-3
+                                button#btn-params(type="button" disabled onclick="AddNewListItem(htmlElems.list.params, paramTypes);").btn.btn-outline-primary.w-100 Добавить
+    script(src="/js/edit.js") 

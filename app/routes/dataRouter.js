@@ -7,11 +7,11 @@ class DataRouter {
         this.dataController = dataController;
         this.router = Router();
 
-        this.router.get(`/${this.dataController.typeName}`, check, this.Get);
-        this.router.get(`/${this.dataController.typeName}/state`, check, this.State);
-        this.router.post(`/${this.dataController.typeName}/add`, check, this.Add);
-        this.router.post(`/${this.dataController.typeName}/update`, check, this.Update);
-        this.router.post(`/${this.dataController.typeName}/delete`, check, this.Delete);
+        this.router.get(`/${this.dataController.typeName}`, check, (req, res) => this.Get(req, res));
+        this.router.get(`/${this.dataController.typeName}/state`, check, (req, res) => this.State(req, res));
+        this.router.post(`/${this.dataController.typeName}/add`, check, (req, res) => this.Add(req, res));
+        this.router.post(`/${this.dataController.typeName}/update`, check, (req, res) => this.Update(req, res));
+        this.router.post(`/${this.dataController.typeName}/delete`, check, (req, res) => this.Delete(req, res));
     }
 
     Get(req, res) {

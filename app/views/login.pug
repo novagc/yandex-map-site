@@ -1,0 +1,25 @@
+
+doctype html 
+html 
+	head 
+		title Войти
+		meta(charset="utf-8")
+		script(src="js/jquery.min.js") 
+		link(rel="stylesheet", href="css/bootstrap.css")
+		link(rel='stylesheet' href='css/center.css')
+	body.container.justify-content-center
+		form(novalidate="" action="/login" method="POST" enctype="application/x-www-form-urlencoded").row.col-4.d-flex.flex-column.justify-content-center.g-2
+			.col-4.w-100.text-center 
+				img(src="img/general/yandex.svg" height="100px")
+			.col-4.w-100.text-center
+				h1.h3.mb-3.fw-normal Аккаунт
+			.col-4.w-100.form-floating
+				input#login(type="text", name="login" placeholder="Логин").form-control
+				label(for="login") Логин
+			.col-4.w-100.form-floating
+				input#password(type="password", name="password" placeholder="Пароль").form-control
+				label(for="password") Пароль
+			.col-4.w-100 
+				button(type="submit").btn.btn-lg.btn-primary.w-100 Войти
+				
+

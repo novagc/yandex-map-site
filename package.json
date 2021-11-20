@@ -7,7 +7,7 @@
   "author": "novagc <novagc@yandex.ru>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js",
+    "dev": "nodemon index.js --config ./nodemon.json",
     "start": "node index.js"
   },
   "devDependencies": {
@@ -18,8 +18,8 @@
     "chokidar": "^3.5.2",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
-    "hbs": "^4.1.2",
     "passport": "^0.5.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "pug": "^3.0.2"
   }
 }

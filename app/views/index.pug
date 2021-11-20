@@ -1,0 +1,95 @@
+meta(charset='UTF-8')
+meta(http-equiv='X-UA-Compatible', content='IE=edge')
+meta(name='viewport', content='width=device-width,initial-scale=1')
+title Карта
+link(rel='stylesheet', href='css/bootstrap.css')
+link(rel='stylesheet', href='css/main.css')
+script(src='js/jquery.min.js')
+script(src='js/lodash-core.js')
+script(src='js/menu.js')
+script(src='js/requests.js')
+script(src='js/map.js')
+script(src=`https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=ru_RU`, type='text/javascript')
+.container-fluid.h-100.p-0
+  #content-container.h-100.d-flex.flex-row
+    .map-container.px-0
+      #map.h-100.hide-labels.
+    #menu.menu-container.bg-dark.text-white.d-flex.flex-column
+      .d-flex.flex-row.w-100
+        img.menu-button(src='/img/general/menu.svg')
+        h1#main-header.text-center Меню
+      ul.menu-list
+        li.menu-header
+          span.title Информация о маркере
+          #info-container.sub-menu-container(data-copacity='335px')
+            ul
+              li
+                select#markSelector(onchange="LoadParamsList();")
+                    each mark, index in marks 
+                        option(selected=index==0, value=mark.id) #{mark.name}
+              li
+                select#markTypeSelector
+                    each type, index in marks[0].types
+                        option(selected=index==0, value=type.id) #{type.name}
+              li
+                input#titleInput(type='text', placeholder='Название')
+              li
+                input#profileInput(type='text', placeholder='Ссылка на профиль').w-90
+                img(src="img/general/link.svg").btn-link
+              li
+                input#whatsappInput(type='text', placeholder='Номер WhatsApp: +78000000000').w-90
+                img(src="img/general/link.svg").btn-link
+              li
+                #descriptionInput.large-text-input(contenteditable='true', data-placeholder='Описание')
+              li
+                input#addressInput(type='text', placeholder='Адрес')
+              li#params-li.menu-header.hiden
+                span.title Дополнительные параметры
+                .sub-menu-container(data-copacity="150px")
+                  ul#params-container
+
+        li.menu-header
+          span.title Фильтры
+          #filter-container.sub-menu-container(data-copacity=`${marks.length ? (39 * 2 + 36 * (marks.length - 1)) : 39}px`)
+            ul#filter-list
+              li
+                input#hidenLabels(type='checkbox', checked)
+                label(for='hidenLabels').mx-2 Скрыть названия
+                each mark in marks
+                    li
+                        input(id=`hiden_${mark.id}` type='checkbox', data-bind-type=mark.id)
+                        label(for=`hiden_${mark.id}`).mx-2 Скрыть #{mark.name}
+        li#params-filter-li.menu-header
+          span.title Фильтр по параметрам
+          .sub-menu-container(data-copacity="150px").d-flex.flex-column
+            ul
+              li
+                select#params-filter-type-select(onchange="LoadParamFilters();")
+                  each mark in marks 
+                    option(value=mark.id) #{mark.name} 
+              li
+                ul#params-filter-container
+                  if marks[0].params
+                    each params in marks[0].params
+                      li
+              li
+                .btn-group(role="group")
+                  button(role="button" onclick="ParamFilter();").btn.btn-outline-warning Применить
+                  button(role="button" onclick="DisplayAll();").btn.btn-outline-warning Очистить
+        li
+          #routeInfo.hiden.
+            
+        li
+          #main-btn-group.btn-group.w-100(role='group', aria-label='buttons')
+            button#createButton.btn.btn-warning(type='button', onclick='CreateButtonClick();') Создать
+            button#moveButton.btn.btn-warning(type='button', onclick='MoveButtonClick();') Передвигать
+        li
+          #edit-btn-group.btn-group.w-100.hiden(role='group', aria-label='buttons')
+            button#saveButton.btn.btn-warning(type='button', onclick='SaveButtonClick();') Сохранить
+            button#cancelButton.btn.btn-warning(type='button', onclick='CancelButtonClick();') Отменить
+            button#deleteButton.btn.btn-warning(type='button', onclick='DeleteButtonClick();') Удалить
+        li
+          #move-btn-group.btn-group.w-100.hiden(role='group', aria-label='buttons')
+            button#stopMovingButton.btn.btn-warning(type='button', onclick='StopMovingButtonClick();') Закончить
+        li
+          a.w-100(type="button" href="/edit").btn.btn-outline-warning Редактор данных меток

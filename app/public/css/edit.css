@@ -1,0 +1,36 @@
+.unselectable,
+.unselectable-recursive,
+.unselectable-recursive * {
+    user-select: none;
+}
+
+.text-large {
+    font-size: 1.35rem;
+}
+
+.active-mark {
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.sticky-top {
+    top: 15px
+}
+
+button:disabled {
+    background-color: #e9ecef !important;
+}
+
+#mark-menu {
+    height: max-content;
+}
+
+#list-types input,
+#list-params input, 
+#list-types select,
+#list-params select {
+    width: 49%;
+}
