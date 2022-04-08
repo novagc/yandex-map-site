@@ -367,3 +367,7 @@ ymaps[class*="search__suggest"] {
   filter: invert(0.6);
   background-color: rgba(255, 255, 255, 0.45);
 }
+
+.mn-50 {
+  min-height: 50px;
+}

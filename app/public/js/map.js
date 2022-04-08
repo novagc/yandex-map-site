@@ -69,7 +69,7 @@ function Init() {
             content : $('#content-container'),
             menu    : $('#menu'),
             map     : $('#map'),
-            route   : $('#routeInfo')       [0],
+            route   : $('#routeInfo'),
             mainBtns: $('#main-btn-group'),
             editBtns: $('#edit-btn-group'),
             moveBtns: $('#move-btn-group'),
@@ -205,11 +205,10 @@ function Init() {
 	multyRouter.model.events.add('requestsuccess', function () {
 		let activeRoute = multyRouter.getActiveRoute();
 		if (activeRoute) {
-			htmlElems.divs.route.removeClass('hide');
-			htmlElems.outputs.len.innerText  = `Длина: ${activeRoute.properties.get("distance").text}`;
-			htmlElems.outputs.time.innerText = `Время: ${activeRoute.properties.get("durationInTraffic").text}`;
+			htmlElems.divs.route.removeClass('hiden');
+            htmlElems.divs.route.html(`Длина: ${activeRoute.properties.get("distance").text}<br>Время: ${activeRoute.properties.get("durationInTraffic").text}`);
 		} else {
-			htmlElems.divs.route.addClass('hide');
+			htmlElems.divs.route.addClass('hiden');
 		}
 	});
 
@@ -221,8 +220,18 @@ function Init() {
     });
 
     setInterval(CheckUpdation, UpdateInterval);
+}
 
+function OpenProfileLink() {
+    if (htmlElems.inputs.profile.value) {
+        window.open(htmlElems.inputs.profile.value.startsWith('http') ? htmlElems.inputs.profile.value : `http://${htmlElems.inputs.profile.value}`, '_blank');
+    }
+}
 
+function OpenWhatsAppLink() {
+    if (htmlElems.inputs.whatsapp.value) {
+        window.open(`https://wa.me/${htmlElems.inputs.whatsapp.value.replaceAll(' ', '').replaceAll('-', '')}`, '_blank');
+    }
 }
 
 function GetParamList() {
@@ -611,7 +620,7 @@ function UpdatePlacemark(pm) {
     pm.properties.set('hintContent', pm.sourcePoint.title);
     pm.properties.set('iconContent', pm.sourcePoint.title);
     pm.properties.set('balloonContentHeader', pm.sourcePoint.title);
-    pm.properties.set('balloonContent', pm.sourcePoint.desc);
+    pm.properties.set('balloonContent', pm.sourcePoint.description);
     pm.properties.set('iconImageHref', GetImgPath(pm.sourcePoint));
     pm.geometry.setCoordinates(pm.sourcePoint.coords);
 }
@@ -748,7 +757,7 @@ function AddPointByAddress() {
                 let point = AddNewPoint(
                     res.geoObjects.get(0).geometry.getCoordinates(),
                     htmlElems.inputs.title.value,
-                    htmlElems.inputs.desc.value,
+                    htmlElems.inputs.desc.innerText,
                     htmlElems.inputs.profile.value,
                     htmlElems.inputs.whatsapp.value,
                     htmlElems.inputs.mark.value,
@@ -775,7 +784,7 @@ function FinishEdit() {
             activePoint.id,
             activePoint.coords,
             htmlElems.inputs.title.value,
-            htmlElems.inputs.desc.value,
+            htmlElems.inputs.desc.innerText,
             htmlElems.inputs.profile.value,
             htmlElems.inputs.whatsapp.value,
             Number(htmlElems.inputs.mark.value),
@@ -827,7 +836,7 @@ function DeleteActivePoint() {
 
 function WritePointInfoToMenu(point) {
     htmlElems.inputs.title.value = point.title;
-    htmlElems.inputs.desc.value  = point.desc;
+    htmlElems.inputs.desc.innerText  = point.description ?? '';
     htmlElems.inputs.profile.value = point.profile;
     htmlElems.inputs.whatsapp.value = point.whatsapp;
     htmlElems.inputs.mark.value = point.markIds[0];
@@ -839,7 +848,7 @@ function WritePointInfoToMenu(point) {
 
 function ClearPointInfo() {
     htmlElems.inputs.title.value = '';
-    htmlElems.inputs.desc.value  = '';
+    htmlElems.inputs.desc.innerText  = '';
     htmlElems.inputs.profile.value = '';
     htmlElems.inputs.whatsapp.value = '';
     htmlElems.inputs.address.value = '';
@@ -917,7 +926,7 @@ function UpdatePoint(id, coords, title, desc, profile, whatsapp, markId, markTyp
         coords  : coords, 
         markIds : [markId, markTypeId],
         title   : title, 
-        desc    : desc, 
+        description: desc, 
         profile : profile, 
         whatsapp: whatsapp, 
         params  : params
@@ -955,7 +964,7 @@ function MapDoubleClickHandler(e) {
             let point = AddNewPoint(
                 e.get('coords'),
                 htmlElems.inputs.title.value,
-                htmlElems.inputs.desc.value,
+                htmlElems.inputs.desc.innerText,
                 htmlElems.inputs.profile.value,
                 htmlElems.inputs.whatsapp.value,
                 htmlElems.inputs.mark.value,
@@ -971,7 +980,7 @@ function MapDoubleClickHandler(e) {
                     activePoint.id,
                     e.get('coords'),
                     htmlElems.inputs.title.value,
-                    htmlElems.inputs.desc.value,
+                    htmlElems.inputs.desc.innerText,
                     htmlElems.inputs.profile.value,
                     htmlElems.inputs.whatsapp.value,
                     htmlElems.inputs.mark.value,

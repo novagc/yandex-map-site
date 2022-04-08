@@ -107,6 +107,7 @@ function ChangeListsItemsEnabling(list, enable) {
 
 function AddNewListItem(list, options) {
     list.append(CreateListItem(-1, "", options, options[0], false));
+    ChangeListsItemsEnabling(list, true);
 }
 
 function ChangeActiveMark(id) {

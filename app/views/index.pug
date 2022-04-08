@@ -15,7 +15,7 @@ script(src=`https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=ru_RU`, type='
     .map-container.px-0
       #map.h-100.hide-labels.
     #menu.menu-container.bg-dark.text-white.d-flex.flex-column
-      .d-flex.flex-row.w-100
+      .d-flex.flex-row.w-100.mn-50
         img.menu-button(src='/img/general/menu.svg')
         h1#main-header.text-center Меню
       ul.menu-list
@@ -35,10 +35,10 @@ script(src=`https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=ru_RU`, type='
                 input#titleInput(type='text', placeholder='Название')
               li
                 input#profileInput(type='text', placeholder='Ссылка на профиль').w-90
-                img(src="img/general/link.svg").btn-link
+                img(src="img/general/link.svg", onclick="OpenProfileLink();").btn-link
               li
                 input#whatsappInput(type='text', placeholder='Номер WhatsApp: +78000000000').w-90
-                img(src="img/general/link.svg").btn-link
+                img(src="img/general/link.svg", onclick="OpenWhatsAppLink();").btn-link
               li
                 #descriptionInput.large-text-input(contenteditable='true', data-placeholder='Описание')
               li
@@ -77,9 +77,6 @@ script(src=`https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=ru_RU`, type='
                   button(role="button" onclick="ParamFilter();").btn.btn-outline-warning Применить
                   button(role="button" onclick="DisplayAll();").btn.btn-outline-warning Очистить
         li
-          #routeInfo.hiden.
-            
-        li
           #main-btn-group.btn-group.w-100(role='group', aria-label='buttons')
             button#createButton.btn.btn-warning(type='button', onclick='CreateButtonClick();') Создать
             button#moveButton.btn.btn-warning(type='button', onclick='MoveButtonClick();') Передвигать
@@ -93,3 +90,5 @@ script(src=`https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=ru_RU`, type='
             button#stopMovingButton.btn.btn-warning(type='button', onclick='StopMovingButtonClick();') Закончить
         li
           a.w-100(type="button" href="/edit").btn.btn-outline-warning Редактор данных меток
+        li
+          #routeInfo.hiden.w-100.text-white
