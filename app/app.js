@@ -1,6 +1,6 @@
 const
 	express = require('express'),
-	session = require('express-session'),
+	session = require('cookie-session'),
 	passport = require('passport'),
 	bodyParser = require('body-parser'),
 	passportInit = require('./auth/passport'),
@@ -17,7 +17,7 @@ function Start() {
         app.use(express.static(`${__dirname}/public`));
         app.use(bodyParser());
         app.use(bodyParser.urlencoded());
-        app.use(session({ secret: 'ASFDJLSKDJOVN', }));
+        app.use(session({ secret: 'ASFDJLSKDJOVN', cookie: { maxAge: 86400000 }}));
     
         app.use(passport.initialize());
         app.use(passport.session());
