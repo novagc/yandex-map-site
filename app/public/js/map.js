@@ -60,7 +60,8 @@ var map             = {},
         points        : [],
         searchControls: []
     },
-    multyRouter     = {};
+    multyRouter     = {},
+    suggestView = {};
 
 
 function Init() {
@@ -111,7 +112,7 @@ function Init() {
 
     InitMenuEvents();
 
-    new ymaps.SuggestView('addressInput');
+    suggestView = new ymaps.SuggestView('addressInput');
 
 	multyRouter = new ymaps.multiRouter.MultiRoute({ referencePoints: [] });
 
@@ -762,6 +763,7 @@ function AddPointByAddress() {
                     htmlElems.inputs.whatsapp.value,
                     htmlElems.inputs.mark.value,
                     htmlElems.inputs.markType.value,
+                    htmlElems.inputs.address.value,
                     GetParams()
                 );
 
@@ -776,27 +778,50 @@ function StartEdit() {
     ClearParamsList();
     LoadParamsList();
     ShowEditButtons();
+
+    suggestView.options.set('provider', 'none');
+
+    setTimeout(() => suggestView.options.set('provider', 'yandex#map'), 300);
 }
 
-function FinishEdit() {
-    if (CheckInputValidity()) {
+async function FinishEdit() {
+    if (CheckInputValidity(true)) {
+        let 
+            id = activePoint.id,
+            coords = activePoint.coords,
+            oldAddress = activePoint.address,
+            newAddress = htmlElems.inputs.address.value,
+            title = htmlElems.inputs.title.value,
+            desc = htmlElems.inputs.desc.innerText,
+            profile = htmlElems.inputs.profile.value,
+            whatsapp = htmlElems.inputs.whatsapp.value,
+            mark = htmlElems.inputs.mark.value,
+            markType = htmlElems.inputs.markType.value,
+            params = GetParams();
+        
+        ClearParamsList();
+        LoadParamsList();
+        ShowMainButtons();
+
+        if (oldAddress != newAddress) {
+            coords = await GetCoordsByAddress();
+        }
+
         UpdatePoint(
-            activePoint.id,
-            activePoint.coords,
-            htmlElems.inputs.title.value,
-            htmlElems.inputs.desc.innerText,
-            htmlElems.inputs.profile.value,
-            htmlElems.inputs.whatsapp.value,
-            Number(htmlElems.inputs.mark.value),
-            Number(htmlElems.inputs.markType.value),
-            GetParams()
+            id,
+            coords,
+            title,
+            desc,
+            profile,
+            whatsapp,
+            mark,
+            markType,
+            newAddress,
+            params
         );
 
         ReDrawActivePoint();
         ClearPointSelection();
-        ClearParamsList();
-        LoadParamsList();
-        ShowMainButtons();
     }
 }
 
@@ -840,10 +865,13 @@ function WritePointInfoToMenu(point) {
     htmlElems.inputs.profile.value = point.profile;
     htmlElems.inputs.whatsapp.value = point.whatsapp;
     htmlElems.inputs.mark.value = point.markIds[0];
+    htmlElems.inputs.address.value = point.address;
 
     LoadMarkTypesToSelect();
 
     htmlElems.inputs.markType.value = point.markIds[1];
+
+    suggestView.state.set('activeIndex', null);
 }
 
 function ClearPointInfo() {
@@ -871,7 +899,7 @@ function LoadMarkTypesToSelect() {
     });
 }
 
-function AddNewPoint(coord, title, desc, profile, whatsapp, markId, markTypeId, params=[]) {
+function AddNewPoint(coord, title, desc, profile, whatsapp, markId, markTypeId, address, params=[]) {
     var point = { 
         id          : GetRandomInt(1e20),
         coords      : coord, 
@@ -880,7 +908,8 @@ function AddNewPoint(coord, title, desc, profile, whatsapp, markId, markTypeId, 
         description : desc ?? '', 
         profile     : profile, 
         whatsapp    : whatsapp, 
-        params      : params
+        params      : params,
+        address     : address,
     }
 
     allPoints.push(point);
@@ -898,16 +927,31 @@ function CancelPointsCoordsChanging() {
     });
 }
 
-function UpdateAllPointsCoords() {
+async function UpdateAllPointsCoords() {
     let newCoordsDictionary = {};
+    let coords = [0, 0];
 
-    placemarks.forEach(x => newCoordsDictionary[x.sourcePoint.id] = x.geometry.getCoordinates());
+    for (let i = 0; i < placemarks.length; i++) {
+        coords = placemarks[i].geometry.getCoordinates();
+
+        if (coords[0] != placemarks[i].sourcePoint.coords[0] ||
+            coords[1] != placemarks[i].sourcePoint.coords[1]) {
+            newCoordsDictionary[placemarks[i].sourcePoint.id] = {
+                coords: coords,
+                address: (await GetAddressByCoords(coords))
+            };
+        }
+    }
+
     requests.points.UpdateCoords(newCoordsDictionary);
+    alert('Новые адреса сохранены!');
 }
 
-function UpdatePointCoords(point, coords, updatePlacemark=false) {
+async function UpdatePointCoords(point, coords, updatePlacemark=false) {
     if (point.coords[0] != coords[0] || point.coords[1] != coords[1]) {
         point.coords = coords;
+        point.address = await GetAddressByCoords(coords);
+
         requests.points.Update(point);
 
         if (updatePlacemark) {
@@ -920,16 +964,17 @@ function UpdatePointCoords(point, coords, updatePlacemark=false) {
     }
 }
 
-function UpdatePoint(id, coords, title, desc, profile, whatsapp, markId, markTypeId, params=[]) {
+function UpdatePoint(id, coords, title, desc, profile, whatsapp, markId, markTypeId, address, params=[]) {
     var point = { 
-        id      : id,
-        coords  : coords, 
-        markIds : [markId, markTypeId],
-        title   : title, 
-        description: desc, 
-        profile : profile, 
-        whatsapp: whatsapp, 
-        params  : params
+        id          : id,
+        coords      : coords, 
+        markIds     : [Number(markId), Number(markTypeId)],
+        title       : title, 
+        description : desc, 
+        profile     : profile, 
+        whatsapp    : whatsapp,
+        address     : address, 
+        params      : params
     }
 
     requests.points.Update(point);
@@ -958,38 +1003,60 @@ function CheckInputValidity(needAddress = false) {
     return valid;
 }
 
-function MapDoubleClickHandler(e) {
+async function MapDoubleClickHandler(e) {
     if (CheckInputValidity()) {
+        let coords = e.get('coords'),
+            title = htmlElems.inputs.title.value,
+            desc = htmlElems.inputs.desc.innerText,
+            profile = htmlElems.inputs.profile.value,
+            whatsapp = htmlElems.inputs.whatsapp.value,
+            mark = htmlElems.inputs.mark.value,
+            markType = htmlElems.inputs.markType.value,
+            params = GetParams(),
+            pointId = !activePoint ? null : activePoint.id;
+        
+        let address = await GetAddressByCoords(coords)
+
         if (!activePoint) {
             let point = AddNewPoint(
-                e.get('coords'),
-                htmlElems.inputs.title.value,
-                htmlElems.inputs.desc.innerText,
-                htmlElems.inputs.profile.value,
-                htmlElems.inputs.whatsapp.value,
-                htmlElems.inputs.mark.value,
-                htmlElems.inputs.markType.value,
-                GetParams()
+                coords,
+                title,
+                desc,
+                profile,
+                whatsapp,
+                mark,
+                markType,
+                address,
+                params
             );
     
             DrawPoint(point);
-            ClearPointSelection();
         } else {
             if (confirm('Сохранить изменения и обновить позицию метки?')) {
                 UpdatePoint(
-                    activePoint.id,
-                    e.get('coords'),
-                    htmlElems.inputs.title.value,
-                    htmlElems.inputs.desc.innerText,
-                    htmlElems.inputs.profile.value,
-                    htmlElems.inputs.whatsapp.value,
-                    htmlElems.inputs.mark.value,
-                    htmlElems.inputs.markType.value,
-                    GetParams()
+                    pointId,
+                    coords,
+                    title,
+                    desc,
+                    profile,
+                    whatsapp,
+                    mark,
+                    markType,
+                    address,
+                    params
                 );
             }
         }
+        ClearPointSelection();
     }
+}
+
+async function GetAddressByCoords(coords) {
+    return (await ymaps.geocode(coords)).geoObjects.get(0).getAddressLine();
+}
+
+async function GetCoordsByAddress(address) {
+    return (await ymaps.geocode(address)).geoObjects.get(0).geometry.getCoordinates();
 }
 
 function GetImgPathFromMarks(markId, markTypeId) {

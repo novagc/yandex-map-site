@@ -7,7 +7,8 @@ let params = new DataController(`${__dirname}/params.json`, 'params');
 points.UpdateCoords = function(coords) {
     points.data.forEach(x => {
         if(coords[x.id]) { 
-            x.coords = coords[x.id];
+            x.coords = coords[x.id].coords;
+            x.address = coords[x.id].address;
         }
     });
     points.Save();
