@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
+function CopyAddress() {
+	if (htmlElems.inputs.address.value) {
+		navigator.clipboard.writeText(htmlElems.inputs.address.value);
+	}
+}
+
 function InitMenuEvents() {
 	htmlElems.filters.labels.change(HideLabelsClick);
 	htmlElems.filters.types.change(HideTypeClick);

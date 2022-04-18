@@ -42,7 +42,8 @@ script(src=`https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=ru_RU`, type='
               li
                 #descriptionInput.large-text-input(contenteditable='true', data-placeholder='Описание')
               li
-                input#addressInput(type='text', placeholder='Адрес')
+                input#addressInput(type='text', placeholder='Адрес').w-90
+                img(src="img/general/copy.svg", onclick="CopyAddress();").btn-link
               li#params-li.menu-header.hiden
                 span.title Дополнительные параметры
                 .sub-menu-container(data-copacity="150px")
